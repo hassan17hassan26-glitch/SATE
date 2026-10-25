@@ -1,0 +1,101 @@
+{
+  "entities": {
+    "membership": {
+      "title": "MembershipApplication",
+      "description": "Educational union membership application",
+      "type": "object",
+      "properties": {
+        "referenceNumber": { "type": "string" },
+        "accessPin": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "birthDate": { "type": "string" },
+        "birthPlace": { "type": "string" },
+        "rankTitle": { "type": "string" },
+        "nin": { "type": "string" },
+        "nss": { "type": "string" },
+        "wilayaId": { "type": "number" },
+        "wilayaName": { "type": "string" },
+        "communeName": { "type": "string" },
+        "institutionName": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string" },
+        "submissionDate": { "type": "string" }
+      },
+      "required": ["referenceNumber", "firstName", "lastName", "rankTitle", "wilayaId", "phone", "status"]
+    },
+    "complaint": {
+      "title": "Complaint",
+      "description": "Union complaint and legal recourse dossier",
+      "type": "object",
+      "properties": {
+        "referenceNumber": { "type": "string" },
+        "accessPin": { "type": "string" },
+        "complainantName": { "type": "string" },
+        "phone": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string" },
+        "wilayaId": { "type": "number" },
+        "wilayaName": { "type": "string" },
+        "isConfidential": { "type": "boolean" },
+        "submissionDate": { "type": "string" }
+      },
+      "required": ["referenceNumber", "title", "description", "status", "wilayaId"]
+    },
+    "unionOfficial": {
+      "title": "UnionOfficial",
+      "description": "Union office president or national bureau official",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "roleType": { "type": "string" },
+        "roleTitle": { "type": "string" },
+        "wilayaId": { "type": "number" },
+        "wilayaName": { "type": "string" },
+        "zone": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "officeAddress": { "type": "string" },
+        "receptionDays": { "type": "string" },
+        "isAvailableForAppointment": { "type": "boolean" },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["fullName", "roleTitle", "phone"]
+    },
+    "auditLog": {
+      "title": "AuditLog",
+      "description": "Law 18-07 system security and activity audit entry",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string" },
+        "actorName": { "type": "string" },
+        "actorRole": { "type": "string" },
+        "action": { "type": "string" },
+        "entityType": { "type": "string" },
+        "entityId": { "type": "string" },
+        "details": { "type": "string" },
+        "severity": { "type": "string" }
+      },
+      "required": ["timestamp", "actorName", "action", "entityType", "entityId"]
+    }
+  },
+  "firestore": {
+    "/memberships/{membershipId}": {
+      "schema": { "$ref": "#/entities/membership" },
+      "description": "Submitted membership applications"
+    },
+    "/complaints/{complaintId}": {
+      "schema": { "$ref": "#/entities/complaint" },
+      "description": "Union complaints and grievances"
+    },
+    "/officials/{officialId}": {
+      "schema": { "$ref": "#/entities/unionOfficial" },
+      "description": "Directory of 69 wilayas and national bureau officials"
+    },
+    "/audit_logs/{logId}": {
+      "schema": { "$ref": "#/entities/auditLog" },
+      "description": "Law 18-07 audit logs"
+    }
+  }
+}

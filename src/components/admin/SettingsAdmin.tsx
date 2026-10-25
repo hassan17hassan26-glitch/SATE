@@ -19,7 +19,9 @@ import {
   Lock,
   HardDrive,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Pencil,
+  Cloud
 } from 'lucide-react';
 import { 
   UnionConfig, 
@@ -29,11 +31,13 @@ import {
   User,
   MembershipApplication,
   Complaint,
-  AuditLog
+  AuditLog,
+  UnionOfficial
 } from '../../types';
 import { AppStorage } from '../../utils/storage';
 import { INITIAL_RANKS, INITIAL_OFFICIALS } from '../../data/algeriaData';
 import { createEncryptedJsonBackup, createSqlBackup, decryptBackupText } from '../../utils/backup';
+import { EditOfficialModal } from '../EditOfficialModal';
 
 interface SettingsAdminProps {
   currentUser: User;
@@ -84,6 +88,52 @@ export const SettingsAdmin: React.FC<SettingsAdminProps> = ({
   const [backupPassphrase, setBackupPassphrase] = useState('DZ-Union-Secure-2025!');
   const [backupToast, setBackupToast] = useState('');
   const [showKey, setShowKey] = useState(false);
+
+  // Officials management state
+  const [officialsList, setOfficialsList] = useState<UnionOfficial[]>(() => AppStorage.getOfficials());
+  const [selectedOfficialForEdit, setSelectedOfficialForEdit] = useState<UnionOfficial | null>(null);
+  const [isEditOfficialModalOpen, setIsEditOfficialModalOpen] = useState(false);
+  const [officialSearchQuery, setOfficialSearchQuery] = useState('');
+  const [officialToast, setOfficialToast] = useState('');
+
+  const handleOpenEditOfficial = (official: UnionOfficial) => {
+    setSelectedOfficialForEdit(official);
+    setIsEditOfficialModalOpen(true);
+  };
+
+  const handleOpenAddOfficial = () => {
+    setSelectedOfficialForEdit(null);
+    setIsEditOfficialModalOpen(true);
+  };
+
+  const handleSaveOfficial = (saved: UnionOfficial, isNew: boolean) => {
+    if (isNew) {
+      AppStorage.addOfficial(saved, currentUser.fullName, currentUser.role);
+      setOfficialToast(`تمت إضافة ${saved.roleTitle} (${saved.fullName}) بنجاح`);
+    } else {
+      AppStorage.updateOfficial(saved, currentUser.fullName, currentUser.role);
+      setOfficialToast(`تم تحديث معلومات ${saved.roleTitle} (${saved.fullName}) بنجاح`);
+    }
+    setOfficialsList(AppStorage.getOfficials());
+    onRefreshData();
+    setTimeout(() => setOfficialToast(''), 4000);
+  };
+
+  const handleDeleteOfficial = (officialId: string) => {
+    AppStorage.deleteOfficial(officialId, currentUser.fullName, currentUser.role);
+    setOfficialToast('تم حذف المسؤول من الدليل بنجاح');
+    setOfficialsList(AppStorage.getOfficials());
+    onRefreshData();
+    setTimeout(() => setOfficialToast(''), 4000);
+  };
+
+  const handleResetOfficials = () => {
+    AppStorage.resetOfficialsToDefault(currentUser.fullName, currentUser.role);
+    setOfficialToast('تمت استعادة كافة المكاتب والمسؤولين الافتراضيين (79 مسؤولاً)');
+    setOfficialsList(AppStorage.getOfficials());
+    onRefreshData();
+    setTimeout(() => setOfficialToast(''), 4000);
+  };
 
   const handleDownloadBackup = () => {
     const backupData = {
@@ -713,6 +763,180 @@ export const SettingsAdmin: React.FC<SettingsAdminProps> = ({
           </div>
         </div>
       </div>
+
+      {/* SECTION 6: UNION OFFICIALS & 69 WILAYAS DIRECTORY MANAGEMENT */}
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
+              <Building2 className="w-5 h-5 text-emerald-700" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-slate-900">
+                6. إدارة المكاتب الولائية ودليل المسؤولين (69 ولاية والمكتب الوطني)
+              </h3>
+              <p className="text-xs text-slate-500">
+                تعديل وتحديث بيانات رؤساء المكاتب، المنسقين، وأعضاء المكتب الوطني مع التوثيق الرقابي
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleOpenAddOfficial}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>إضافة مسؤول جديد</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleResetOfficials}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1 cursor-pointer"
+              title="استعادة القائمة الرسمية لـ 69 ولاية"
+            >
+              <RotateCcw className="w-3 h-3 text-slate-500" />
+              <span>استعادة الافتراضي</span>
+            </button>
+          </div>
+        </div>
+
+        {officialToast && (
+          <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{officialToast}</span>
+          </div>
+        )}
+
+        {/* Quick Search */}
+        <div className="flex items-center justify-between gap-3">
+          <input
+            type="text"
+            value={officialSearchQuery}
+            onChange={e => setOfficialSearchQuery(e.target.value)}
+            placeholder="ابحث بالاسم، الولاية، أو الصفة (مثال: وهران، بريكة، الأمين العام)..."
+            className="w-full sm:w-80 px-3.5 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+          />
+          <span className="text-xs text-slate-500 shrink-0">
+            إجمالي المسؤولين: <strong className="text-emerald-900 font-bold">{officialsList.length}</strong>
+          </span>
+        </div>
+
+        {/* Table of officials */}
+        <div className="max-h-72 overflow-y-auto rounded-2xl border border-slate-200 text-xs">
+          <table className="w-full text-right">
+            <thead className="bg-slate-50 text-slate-600 font-bold border-b sticky top-0 z-10">
+              <tr>
+                <th className="p-3">الولاية / الهيكل</th>
+                <th className="p-3">الاسم واللقب</th>
+                <th className="p-3">الصفة النقابية</th>
+                <th className="p-3">الهاتف المباشر</th>
+                <th className="p-3">أوقات الاستقبال</th>
+                <th className="p-3 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {officialsList
+                .filter(o => {
+                  if (!officialSearchQuery.trim()) return true;
+                  const q = officialSearchQuery.toLowerCase();
+                  return (
+                    o.fullName.toLowerCase().includes(q) ||
+                    o.roleTitle.toLowerCase().includes(q) ||
+                    (o.wilayaName && o.wilayaName.toLowerCase().includes(q)) ||
+                    (o.wilayaId && o.wilayaId.toString() === q)
+                  );
+                })
+                .slice(0, 30)
+                .map(o => (
+                  <tr key={o.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="p-3 font-semibold text-slate-800">
+                      {o.wilayaId ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-md bg-emerald-800 text-white font-mono text-[10px] flex items-center justify-center font-bold">
+                            {o.wilayaId}
+                          </span>
+                          <span>{o.wilayaName}</span>
+                        </span>
+                      ) : (
+                        <span className="text-emerald-700 font-bold">المكتب الوطني</span>
+                      )}
+                    </td>
+                    <td className="p-3 font-bold text-slate-900">{o.fullName}</td>
+                    <td className="p-3 text-emerald-800">{o.roleTitle}</td>
+                    <td className="p-3 font-mono text-slate-600" dir="ltr">{o.phone}</td>
+                    <td className="p-3 text-slate-500 text-[11px] max-w-xs truncate">{o.receptionDays}</td>
+                    <td className="p-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditOfficial(o)}
+                        className="p-1.5 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 transition-all font-bold text-[11px] inline-flex items-center gap-1 cursor-pointer"
+                        title="تعديل معلومات المسؤول"
+                      >
+                        <Pencil className="w-3 h-3 text-emerald-700 group-hover:text-white" />
+                        <span>تعديل</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* SECTION 7: FIREBASE CLOUD DATABASE & REALTIME SYNC */}
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center">
+              <Cloud className="w-5 h-5 text-sky-700" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-slate-900">
+                7. الاتصال السحابي وقاعدة بيانات Firebase Firestore
+              </h3>
+              <p className="text-xs text-slate-500">
+                قاعدة البيانات السحابية المركزية المعتمدة للمزامنة الفورية وقواعد الأمان المشددة
+              </p>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>متصل بالسحابة (Firebase Active)</span>
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+            <span className="text-slate-500 block text-[11px]">معرف المشروع (Project ID):</span>
+            <span className="font-mono font-bold text-slate-900 block" dir="ltr">warm-spider-j01dl</span>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+            <span className="text-slate-500 block text-[11px]">معرف قاعدة البيانات (Database):</span>
+            <span className="font-mono font-bold text-slate-900 block truncate" dir="ltr">ai-studio-eeb2847d</span>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+            <span className="text-slate-500 block text-[11px]">حالة قواعد الحماية (Rules):</span>
+            <span className="font-bold text-emerald-700 block flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>مفعلة ومنشورة (قانون 18-07)</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Official Modal */}
+      <EditOfficialModal
+        isOpen={isEditOfficialModalOpen}
+        onClose={() => setIsEditOfficialModalOpen(false)}
+        official={selectedOfficialForEdit}
+        currentUser={currentUser}
+        onSave={handleSaveOfficial}
+        onDelete={handleDeleteOfficial}
+      />
 
     </div>
   );

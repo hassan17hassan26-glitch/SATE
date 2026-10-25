@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Memberships Collection
+    match /memberships/{membershipId} {
+      allow create: if true;
+      allow read, update: if true;
+      allow delete: if isAuthenticated();
+    }
+
+    // Complaints Collection
+    match /complaints/{complaintId} {
+      allow create: if true;
+      allow read, update: if true;
+      allow delete: if isAuthenticated();
+    }
+
+    // Union Officials Directory (69 Wilayas + National Bureau)
+    match /officials/{officialId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Law 18-07 Audit Logs (Immutable append-only audit trail)
+    match /audit_logs/{logId} {
+      allow read, create: if true;
+      allow update, delete: if false;
+    }
+
+    // Default fallback
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

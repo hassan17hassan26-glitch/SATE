@@ -350,6 +350,14 @@ export const MembershipTracking: React.FC<MembershipTrackingProps> = ({ config, 
                   <span className="text-slate-500">الاسم واللقب:</span>
                   <span className="font-bold text-slate-900">{application.firstName} {application.lastName}</span>
                 </div>
+                {application.birthDate && (
+                  <div className="flex justify-between border-b border-slate-200/60 pb-2">
+                    <span className="text-slate-500">تاريخ ومكان الميلاد:</span>
+                    <span className="font-bold text-slate-800">
+                      {new Date(application.birthDate).toLocaleDateString('ar-DZ')} {application.birthPlace ? `(${application.birthPlace})` : ''}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between border-b border-slate-200/60 pb-2">
                   <span className="text-slate-500">الرتبة في التعليم:</span>
                   <span className="font-bold text-emerald-900">{application.rankTitle}</span>

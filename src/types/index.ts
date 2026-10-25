@@ -49,6 +49,8 @@ export interface MembershipApplication {
   accessPin: string;       // رمز سري للمتابعة الآمنة دون تسريب
   firstName: string;
   lastName: string;
+  birthDate?: string;      // تاريخ الميلاد (مثال: 1985-06-15)
+  birthPlace?: string;     // مكان الميلاد (مثال: سطيف، الجزائر، باتنة...)
   rankId: string;
   rankTitle: string;
   nin: string;             // رقم التعريف الوطني (18 رقم) - مشفر أو مخزن بشكل محمي

@@ -382,11 +382,19 @@ export const MembershipAdmin: React.FC<MembershipAdminProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-2xl">
               <div className="space-y-2">
                 <div><span className="text-slate-500">الرتبة:</span> <strong>{activeApp.rankTitle}</strong></div>
+                <div>
+                  <span className="text-slate-500">تاريخ ومكان الميلاد:</span>{' '}
+                  <strong>
+                    {activeApp.birthDate ? new Date(activeApp.birthDate).toLocaleDateString('ar-DZ') : 'غير محدد'}{' '}
+                    {activeApp.birthPlace ? `(${activeApp.birthPlace})` : ''}
+                  </strong>
+                </div>
                 <div><span className="text-slate-500">المؤسسة:</span> <strong>{activeApp.institutionName}</strong></div>
                 <div><span className="text-slate-500">المقاطعة:</span> <strong>ولاية {activeApp.wilayaName} ({activeApp.communeName})</strong></div>
               </div>
               <div className="space-y-2">
                 <div><span className="text-slate-500">الهاتف:</span> <strong className="font-mono" dir="ltr">{activeApp.phone}</strong></div>
+                <div><span className="text-slate-500">البريد الإلكتروني:</span> <strong className="font-mono">{activeApp.email || 'غير مسجل'}</strong></div>
                 <div><span className="text-slate-500">NIN:</span> <strong className="font-mono" dir="ltr">{activeApp.maskedNin}</strong></div>
                 <div><span className="text-slate-500">الضمان الاجتماعي:</span> <strong className="font-mono" dir="ltr">{activeApp.maskedNss}</strong></div>
               </div>

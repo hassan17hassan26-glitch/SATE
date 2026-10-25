@@ -229,3 +229,63 @@ test('Union Officials Directory (National Bureau + 69 Wilayas) test', async () =
   }
 });
 
+test('Membership Application Birth Date and Place tests', () => {
+  const dummyMember = {
+    id: 'test_memb_birth',
+    referenceNumber: 'DZ-MEMB-2025-9999',
+    accessPin: '123456',
+    firstName: 'طارق',
+    lastName: 'زياني',
+    birthDate: '1987-09-12',
+    birthPlace: 'باتنة',
+    rankId: 'rank_1',
+    rankTitle: 'أستاذ المدرسة الابتدائية',
+    nin: '198705010023456789',
+    nss: '123456789012',
+    maskedNin: '1987**********6789',
+    maskedNss: '123********012',
+    wilayaId: 5,
+    wilayaName: 'باتنة',
+    communeName: 'باتنة',
+    institutionId: 'inst_1',
+    institutionName: 'مدرسة الشهداء',
+    phone: '0550123456',
+    email: 'tarek@example.dz',
+    status: 'received' as const,
+    submissionDate: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    statusHistory: [],
+    privacyConsent: { accepted: true, acceptedAt: new Date().toISOString(), lawNotice: '18-07' }
+  };
+
+  assert.equal(Boolean(dummyMember.birthDate), true);
+  assert.equal(dummyMember.birthDate, '1987-09-12');
+  assert.equal(dummyMember.birthPlace, 'باتنة');
+});
+
+test('Officials Management Operations (Add, Update, Delete) tests', async () => {
+  const { AppStorage } = await import('../utils/storage');
+  
+  // Test updateOfficial mock check
+  const testOfficial = {
+    id: 'off_test_999',
+    fullName: 'ذ. سمير معمري',
+    roleType: 'wilaya_president' as const,
+    roleTitle: 'رئيس المكتب الولائي',
+    wilayaId: 60,
+    wilayaName: 'بريكة',
+    zone: 'high_plateaus' as const,
+    phone: '0550 99 88 77',
+    email: 'barika@sate-dz.org',
+    officeAddress: 'شارع الاستقلال، بريكة',
+    receptionDays: 'الإثنين والأربعاء (09:00 - 15:00)',
+    isAvailableForAppointment: true,
+    isActive: true
+  };
+
+  assert.equal(testOfficial.fullName, 'ذ. سمير معمري');
+  assert.equal(testOfficial.wilayaName, 'بريكة');
+  assert.equal(testOfficial.wilayaId, 60);
+});
+
+

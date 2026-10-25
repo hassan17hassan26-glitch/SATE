@@ -414,15 +414,29 @@ export const UnionDirectoryView: React.FC<UnionDirectoryViewProps> = ({
                       </div>
                     )}
 
-                    {/* Zone Badge */}
-                    <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
-                      {official.zone === 'national' && 'مركزي'}
-                      {official.zone === 'center' && 'الوسط'}
-                      {official.zone === 'east' && 'الشرق'}
-                      {official.zone === 'west' && 'الغرب'}
-                      {official.zone === 'south' && 'الجنوب'}
-                      {official.zone === 'high_plateaus' && 'الهضاب العليا'}
-                    </span>
+                    {/* Zone Badge & Edit Button */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium">
+                        {official.zone === 'national' && 'مركزي'}
+                        {official.zone === 'center' && 'الوسط'}
+                        {official.zone === 'east' && 'الشرق'}
+                        {official.zone === 'west' && 'الغرب'}
+                        {official.zone === 'south' && 'الجنوب'}
+                        {official.zone === 'high_plateaus' && 'الهضاب العليا'}
+                      </span>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(official);
+                        }}
+                        className="py-1 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white border border-emerald-200 hover:border-emerald-600 transition-all cursor-pointer flex items-center gap-1 shadow-2xs group/btn"
+                        title={`تعديل معلومات ${official.fullName} (${official.roleTitle})`}
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-emerald-700 group-hover/btn:text-white" />
+                        <span className="text-[11px] font-bold">تعديل</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Main Details */}
@@ -485,6 +499,15 @@ export const UnionDirectoryView: React.FC<UnionDirectoryViewProps> = ({
                       >
                         <Calendar className="w-3.5 h-3.5" />
                         <span>طلب مقابلة نقابية</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleOpenEdit(official)}
+                        className="py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 font-bold text-xs border border-slate-200 hover:border-emerald-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="تعديل بيانات هذا المسؤول والمكتب"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="hidden sm:inline">تعديل</span>
                       </button>
 
                       {official.wilayaId && (
@@ -659,6 +682,16 @@ export const UnionDirectoryView: React.FC<UnionDirectoryViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Edit Official Modal */}
+      <EditOfficialModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        official={selectedOfficialForEdit}
+        currentUser={currentUser}
+        onSave={handleSaveOfficial}
+        onDelete={handleDeleteOfficial}
+      />
     </div>
   );
 };

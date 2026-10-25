@@ -128,11 +128,13 @@ export default function App() {
 
   // CSV Export functions respecting Algerian Law 18-07 data minimization
   const handleExportMembershipsCSV = () => {
-    const headers = ['الرقم المرجعي', 'الاسم', 'اللقب', 'الرتبة', 'المؤسسة', 'الولاية', 'البلدية', 'رقم NIN (مقنع)', 'رقم الضمان (مقنع)', 'الحالة', 'تاريخ الإيداع'];
+    const headers = ['الرقم المرجعي', 'الاسم', 'اللقب', 'تاريخ الميلاد', 'مكان الميلاد', 'الرتبة', 'المؤسسة', 'الولاية', 'البلدية', 'رقم NIN (مقنع)', 'رقم الضمان (مقنع)', 'الحالة', 'تاريخ الإيداع'];
     const rows = memberships.map(m => [
       m.referenceNumber,
       m.firstName,
       m.lastName,
+      m.birthDate || '',
+      `"${(m.birthPlace || '').replace(/"/g, '""')}"`,
       m.rankTitle,
       `"${m.institutionName.replace(/"/g, '""')}"`,
       m.wilayaName,
@@ -282,6 +284,8 @@ export default function App() {
             officials={officials}
             config={config}
             onNavigate={handleSelectTab}
+            currentUser={currentUser}
+            onRefreshData={refreshAllData}
           />
         )}
 

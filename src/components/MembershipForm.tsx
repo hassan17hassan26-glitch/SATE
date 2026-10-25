@@ -56,6 +56,8 @@ export const MembershipForm: React.FC<MembershipFormProps> = ({
   // Form fields
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [birthPlace, setBirthPlace] = useState('');
   const [rankId, setRankId] = useState('');
   const [nin, setNin] = useState('');
   const [nss, setNss] = useState('');
@@ -94,6 +96,14 @@ export const MembershipForm: React.FC<MembershipFormProps> = ({
 
     if (!isValidArabicName(lastName)) {
       newErrors.lastName = 'يرجى كتابة اللقب بالعربية وبصيغة صحيحة (أحرف عربية فقط)';
+    }
+
+    if (!birthDate) {
+      newErrors.birthDate = 'يرجى تحديد تاريخ الميلاد';
+    }
+
+    if (!birthPlace.trim()) {
+      newErrors.birthPlace = 'يرجى إدخال مكان الميلاد (البلدية والولاية)';
     }
 
     if (!rankId) {
@@ -144,6 +154,8 @@ export const MembershipForm: React.FC<MembershipFormProps> = ({
       accessPin,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
+      birthDate: birthDate || undefined,
+      birthPlace: birthPlace.trim() || undefined,
       rankId,
       rankTitle: selectedRank ? selectedRank.title : 'غير محدد',
       nin: nin.trim(),
@@ -254,6 +266,13 @@ export const MembershipForm: React.FC<MembershipFormProps> = ({
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
                 <span className="text-slate-500">الاسم واللقب:</span>
                 <span className="font-bold text-slate-900">{submittedApplication.firstName} {submittedApplication.lastName}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
+                <span className="text-slate-500">تاريخ ومكان الميلاد:</span>
+                <span className="font-bold text-slate-800">
+                  {submittedApplication.birthDate ? new Date(submittedApplication.birthDate).toLocaleDateString('ar-DZ') : 'غير محدد'}{' '}
+                  {submittedApplication.birthPlace ? `(${submittedApplication.birthPlace})` : ''}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
                 <span className="text-slate-500">الرتبة المهنية:</span>
@@ -368,6 +387,40 @@ export const MembershipForm: React.FC<MembershipFormProps> = ({
                 }`}
               />
               {errors.lastName && <p className="text-[11px] text-red-500 mt-1">{errors.lastName}</p>}
+            </div>
+          </div>
+
+          {/* تاريخ ومكان الميلاد */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                تاريخ الميلاد <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={e => setBirthDate(e.target.value)}
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white ${
+                  errors.birthDate ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+                }`}
+              />
+              {errors.birthDate && <p className="text-[11px] text-red-500 mt-1">{errors.birthDate}</p>}
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                مكان الميلاد (البلدية والولاية) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={birthPlace}
+                onChange={e => setBirthPlace(e.target.value)}
+                placeholder="مثال: سطيف، الجزائر الوسطى، وهران..."
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                  errors.birthPlace ? 'border-red-400 bg-red-50/30' : 'border-slate-200'
+                }`}
+              />
+              {errors.birthPlace && <p className="text-[11px] text-red-500 mt-1">{errors.birthPlace}</p>}
             </div>
           </div>
         </div>
@@ -641,6 +694,13 @@ export const MembershipForm: React.FC<MembershipFormProps> = ({
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
                 <span className="text-slate-500">الاسم واللقب:</span>
                 <span className="font-bold text-slate-900">{firstName} {lastName}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
+                <span className="text-slate-500">تاريخ ومكان الميلاد:</span>
+                <span className="font-bold text-slate-800">
+                  {birthDate ? new Date(birthDate).toLocaleDateString('ar-DZ') : 'غير محدد'}{' '}
+                  {birthPlace ? `(${birthPlace})` : ''}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
                 <span className="text-slate-500">الرتبة:</span>
